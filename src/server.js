@@ -29,16 +29,25 @@ const startChatBot = (socket, clients) => {
 
 const main = () => {
   const server = net.createServer();
-
-  const clients = [];
+  let count = 0;
 
   server.listen(8000, () => {
     console.log("Server started listening...");
   });
 
   server.on("connection", (socket) => {
-    clients.push(socket);
-    startChatBot(socket, clients);
+    socket.setEncoding("utf-8");
+
+    socket.write("Guess a number\n");
+
+    socket.on("data", (data) => {
+      count++;
+      if (count === 5) {
+        socket.write("You lose\n");
+        socket.end();
+      }
+      console.log(data);
+    });
   });
 };
 
