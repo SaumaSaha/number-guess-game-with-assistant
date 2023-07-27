@@ -17,16 +17,29 @@ const onConnection = (socket, id) => {
   socket.on("end", () => console.log(`Client ${id} closed`));
 };
 
+const startChatBot = (socket, clients) => {
+  socket.setEncoding("utf-8");
+
+  socket.on("data", (data) => {
+    clients.forEach((client) => {
+      if (client !== socket) client.write(`${data.trim()}\n`);
+    });
+  });
+};
+
 const main = () => {
-  let id = 0;
   const server = net.createServer();
 
-  //so the server starts listening in the port when we call server.listen and give a port number and it call the call back given to it
+  const clients = [];
+
   server.listen(8000, () => {
     console.log("Server started listening...");
   });
 
-  server.on("connection", (socket) => onConnection(socket, ++ id));
+  server.on("connection", (socket) => {
+    clients.push(socket);
+    startChatBot(socket, clients);
+  });
 };
 
 main();
