@@ -19,21 +19,13 @@ class Assistant {
     return this.#currentNumber;
   }
 
-  #smallerNumber() {
-    this.#upperLimit = this.#currentNumber - 1;
-  }
-
-  #biggerNumber() {
-    this.#lowerLimit = this.#currentNumber + 1;
-  }
-
   suggestNumber(result) {
     if (result.isLower) {
-      this.#biggerNumber();
+      this.#lowerLimit = this.#currentNumber + 1;
     }
 
-    if (result.isHigher) {
-      this.#smallerNumber();
+    if (result.isBigger) {
+      this.#upperLimit = this.#currentNumber - 1;
     }
 
     return this.#generateRandomNumber();
@@ -58,9 +50,18 @@ class AssistantController {
 
   #generateMessage(result) {
     let message = "small";
-    if (result.isHigher) message = "big";
+    if (!result.isBigger && !result.isLower) {
+      return "Guess a number";
+    }
+    if (result.isBigger) message = "big";
 
     return `Server response: Number is too ${message}`;
+  }
+
+  #generateAndDisplayMessage(result, number) {
+    const message = this.#generateMessage(result);
+    console.log(message);
+    console.log(`Assistant said: ${number}\n`);
   }
 
   #onData(data) {
@@ -72,13 +73,12 @@ class AssistantController {
       return;
     }
 
-    const message = this.#generateMessage(result);
     const number = this.#assistant.suggestNumber(result);
+    this.#generateAndDisplayMessage(result, number);
 
-    console.log(message);
-    console.log(`Assistant said: ${number}\n`);
-
-    this.#socket.write(`${number}`);
+    setTimeout(() => {
+      this.#socket.write(`${number}`);
+    }, 1100);
   }
 
   start() {
