@@ -20,7 +20,7 @@ class GuessGame {
     this.#chancesLeft--;
   }
 
-  #validateGuess(guess) {
+  #isGameOver(guess) {
     if (guess === this.#luckyNumber) {
       this.#gameWon = true;
       return;
@@ -40,9 +40,9 @@ class GuessGame {
     }
   }
 
-  play(guess) {
+  validate(guess) {
     this.#reduceChances();
-    this.#validateGuess(guess);
+    this.#isGameOver(guess);
     this.#isBiggerOrLower(guess);
   }
 
@@ -65,22 +65,51 @@ class GameController {
     this.#socket = socket;
   }
 
-  #isValidInput(input) {
-    return !/[^0-9]+/.test(input);
+  #onGuess(guess) {
+    this.#game.validate(guess);
+    const state = this.#game.state();
+    let response = { message: "guess-again", state };
+
+    if (state.isWon || state.isLost) {
+      response.message = "game-over";
+      this.#socket.write(JSON.stringify(response));
+      this.#socket.end();
+      return;
+    }
+
+    this.#socket.write(JSON.stringify(response));
   }
 
-  #onGuess(guess) {
-    this.#game.play(guess);
-    const state = this.#game.state();
+  #startGame() {
+    const response = {
+      message: "game-started",
+      state: this.#game.state(),
+    };
 
-    this.#socket.write(JSON.stringify({ ...state }));
-    if (state.isWon || state.isLost) this.#socket.end();
+    this.#socket.write(JSON.stringify(response));
   }
 
   start() {
-    this.#socket.write(JSON.stringify(this.#game.state()));
+    const initialResponse = {
+      message: "initial-setup-info",
+      description:
+        "This is a number guess game you have to guess a number between 0 to 10",
+      lowerLimit: 0,
+      upperLimit: 10,
+    };
+    this.#socket.write(JSON.stringify(initialResponse));
+
     this.#socket.on("data", (data) => {
-      if (this.#isValidInput(data.trim())) this.#onGuess(+data.trim());
+      const acknowledgement = JSON.parse(data);
+      const { message } = acknowledgement;
+
+      if (message === "setup-done") {
+        this.#startGame();
+      }
+
+      if (message === "validate-guess") {
+        this.#onGuess(acknowledgement.guess);
+      }
     });
   }
 }
