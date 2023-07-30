@@ -35,9 +35,9 @@ class GameController {
     const initialResponse = {
       message: "initial-setup-info",
       description:
-        "This is a number guess game you have to guess a number between 0 to 10",
+        "This is a number guess game you have to guess a number between 0 to 20",
       lowerLimit: 0,
-      upperLimit: 10,
+      upperLimit: 20,
     };
     this.#socket.write(JSON.stringify(initialResponse));
 

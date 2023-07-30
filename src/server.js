@@ -14,7 +14,7 @@ const main = () => {
 
   server.on("connection", (socket) => {
     socket.setEncoding("utf-8");
-    const game = new GuessGame(generateRandomNumber(10), 5);
+    const game = new GuessGame(generateRandomNumber(20), 5);
     const gameController = new GameController(game, socket);
     gameController.start();
   });
