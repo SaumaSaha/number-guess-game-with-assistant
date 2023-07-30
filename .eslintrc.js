@@ -26,6 +26,6 @@ module.exports = {
     "prefer-rest-params": ["error"],
     "prefer-const": ["error"],
     "prefer-destructuring": ["error"],
-    "id-length": ["error", { exceptions: ["a", "b", "id"], min: 3, max: 20 }],
+    "id-length": ["error", { exceptions: ["a", "b", "id"], min: 3, max: 25 }],
   },
 };

@@ -68,7 +68,7 @@ class GameController {
   #onGuess(guess) {
     this.#game.validate(guess);
     const state = this.#game.state();
-    let response = { message: "guess-again", state };
+    const response = { message: "guess-again", state };
 
     if (state.isWon || state.isLost) {
       response.message = "game-over";
