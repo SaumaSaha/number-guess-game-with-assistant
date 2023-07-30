@@ -74,3 +74,5 @@ class AssistantController {
     });
   }
 }
+
+module.exports = { AssistantController };

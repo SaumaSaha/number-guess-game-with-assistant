@@ -1,4 +1,6 @@
 const net = require("node:net");
+const { GuessGame } = require("./game.js");
+const { GameController } = require("./game-controller.js");
 
 const generateRandomNumber = (upperLimit) =>
   Math.floor(Math.random() * upperLimit);

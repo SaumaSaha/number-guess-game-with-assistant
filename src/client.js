@@ -1,6 +1,7 @@
 const net = require("node:net");
 const { Assistant } = require("./assistant.js");
 const { AssistantView } = require("./assistant-view.js");
+const { AssistantController } = require("./assistant-controller.js");
 
 const main = () => {
   const client = net.createConnection(8000);
