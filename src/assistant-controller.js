@@ -1,36 +1,16 @@
 const net = require("node:net");
 const { Assistant } = require("./assistant.js");
+const { AssistantView } = require("./assistant-view.js");
 
 class AssistantController {
   #socket;
   #assistant;
+  #view;
 
-  constructor(assistant, socket) {
+  constructor(assistant, socket, view) {
     this.#socket = socket;
     this.#assistant = assistant;
-  }
-
-  #generateGameEndingMessage(isWon, luckyNumber) {
-    let message = `You Lost the lucky number is ${luckyNumber}`;
-    if (isWon) message = "Correct Guess, You Won";
-
-    return message;
-  }
-
-  #generateMessage(result) {
-    let message = "small";
-    if (!result.isBigger && !result.isLower) {
-      return "Guess a number";
-    }
-    if (result.isBigger) message = "big";
-
-    return `Server response: Number is too ${message}`;
-  }
-
-  #generateAndDisplayMessage(result, number) {
-    const message = this.#generateMessage(result);
-    console.log(message);
-    console.log(`Assistant said: ${number}\n`);
+    this.#view = view;
   }
 
   #initialSetup(serverResponse) {
@@ -38,24 +18,29 @@ class AssistantController {
 
     this.#assistant.start(lowerLimit, upperLimit);
 
-    console.log(description);
-
     const acknowledgement = {
       message: "setup-done",
       startGame: true,
       setupComplete: true,
     };
 
+    this.#view.show(description);
     this.#socket.write(JSON.stringify(acknowledgement));
   }
 
-  #guess(state) {
+  #guess(serverResponse) {
+    const { message, state } = serverResponse;
     const { result } = state;
 
     const number = this.#assistant.suggestNumber(result);
-    this.#generateAndDisplayMessage(result, number);
 
     const acknowledgement = { message: "validate-guess", guess: number };
+
+    if (message === "game-started") {
+      this.#view.gameStartMessage(number);
+    } else {
+      this.#view.generateAndDisplayMessage(result, number);
+    }
 
     setTimeout(() => {
       this.#socket.write(JSON.stringify(acknowledgement));
@@ -66,8 +51,7 @@ class AssistantController {
     const { isWon, isLost, luckyNumber } = state;
 
     if (isWon || isLost) {
-      const message = this.#generateGameEndingMessage(isWon, luckyNumber);
-      console.log(message);
+      this.#view.displayGameEndingMessage(isWon, luckyNumber);
     }
   }
 
@@ -77,15 +61,15 @@ class AssistantController {
 
     if (message === "initial-setup-info") {
       this.#initialSetup(serverResponse);
-    }
-
-    if (message === "game-started" || message === "guess-again") {
-      this.#guess(serverResponse.state);
+      return;
     }
 
     if (message === "game-over") {
       this.#end(serverResponse.state);
+      return;
     }
+
+    this.#guess(serverResponse);
   }
 
   start() {
@@ -101,7 +85,12 @@ const main = () => {
 
   client.on("connect", () => {
     const assistant = new Assistant(0, 10);
-    const assistantController = new AssistantController(assistant, client);
+    const view = new AssistantView();
+    const assistantController = new AssistantController(
+      assistant,
+      client,
+      view
+    );
     assistantController.start();
   });
 };
