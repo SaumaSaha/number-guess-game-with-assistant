@@ -103,12 +103,13 @@ class GameController {
       const acknowledgement = JSON.parse(data);
       const { message } = acknowledgement;
 
-      if (message === "setup-done") {
-        this.#startGame();
-      }
-
-      if (message === "validate-guess") {
-        this.#onGuess(acknowledgement.guess);
+      switch (message) {
+        case "setup-done":
+          this.#startGame();
+          break;
+        case "validate-guess":
+          this.#onGuess(acknowledgement.guess);
+          break;
       }
     });
   }

@@ -59,17 +59,17 @@ class AssistantController {
     const serverResponse = JSON.parse(data);
     const { message } = serverResponse;
 
-    if (message === "initial-setup-info") {
-      this.#initialSetup(serverResponse);
-      return;
+    switch (message) {
+      case "initial-setup-info":
+        this.#initialSetup(serverResponse);
+        break;
+      case "game-over":
+        this.#end(serverResponse.state);
+        break;
+      default:
+        this.#guess(serverResponse);
+        break;
     }
-
-    if (message === "game-over") {
-      this.#end(serverResponse.state);
-      return;
-    }
-
-    this.#guess(serverResponse);
   }
 
   start() {
