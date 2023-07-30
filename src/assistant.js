@@ -16,7 +16,7 @@ class Assistant {
   }
 
   suggestNumber(result) {
-    if (result.isLower) {
+    if (result.isSmaller) {
       this.#lowerLimit = this.#currentNumber + 1;
     }
 

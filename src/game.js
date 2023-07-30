@@ -11,7 +11,7 @@ class GuessGame {
     this.#luckyNumber = number;
     this.#chancesLeft = chancesLeft;
     this.#chancesLeft = chancesLeft;
-    this.#result = { isBigger: false, isLower: false };
+    this.#result = { isBigger: false, isSmaller: false };
     this.#gameWon = false;
     this.#gameLost = false;
   }
@@ -31,12 +31,12 @@ class GuessGame {
   #isBiggerOrLower(guess) {
     if (guess > this.#luckyNumber) {
       this.#result.isBigger = true;
-      this.#result.isLower = false;
+      this.#result.isSmaller = false;
     }
 
     if (guess < this.#luckyNumber) {
       this.#result.isBigger = false;
-      this.#result.isLower = true;
+      this.#result.isSmaller = true;
     }
   }
 
