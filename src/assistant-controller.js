@@ -1,7 +1,3 @@
-const net = require("node:net");
-const { Assistant } = require("./assistant.js");
-const { AssistantView } = require("./assistant-view.js");
-
 class AssistantController {
   #socket;
   #assistant;
@@ -78,21 +74,3 @@ class AssistantController {
     });
   }
 }
-
-const main = () => {
-  const client = net.createConnection(8000);
-  client.setEncoding("utf-8");
-
-  client.on("connect", () => {
-    const assistant = new Assistant(0, 10);
-    const view = new AssistantView();
-    const assistantController = new AssistantController(
-      assistant,
-      client,
-      view
-    );
-    assistantController.start();
-  });
-};
-
-main();
