@@ -14,14 +14,14 @@ class AssistantController {
 
     this.#assistant.start(lowerLimit, upperLimit);
 
-    const acknowledgement = {
-      message: "setup-done",
+    const request = {
+      message: "start-game",
       startGame: true,
       setupComplete: true,
     };
 
     this.#view.show(description);
-    this.#socket.write(JSON.stringify(acknowledgement));
+    this.#socket.write(JSON.stringify(request));
   }
 
   #guess(serverResponse) {
@@ -30,7 +30,7 @@ class AssistantController {
 
     const number = this.#assistant.suggestNumber(result);
 
-    const acknowledgement = { message: "validate-guess", guess: number };
+    const request = { message: "validate-guess", guess: number };
 
     if (message === "game-started") {
       this.#view.gameStartMessage(number);
@@ -39,7 +39,7 @@ class AssistantController {
     }
 
     setTimeout(() => {
-      this.#socket.write(JSON.stringify(acknowledgement));
+      this.#socket.write(JSON.stringify(request));
     }, 1100);
   }
 

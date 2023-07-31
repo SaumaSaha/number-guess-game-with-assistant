@@ -42,15 +42,15 @@ class GameController {
     this.#socket.write(JSON.stringify(initialResponse));
 
     this.#socket.on("data", (data) => {
-      const acknowledgement = JSON.parse(data);
-      const { message } = acknowledgement;
+      const request = JSON.parse(data);
+      const { message } = request;
 
       switch (message) {
-        case "setup-done":
+        case "start-game":
           this.#startGame();
           break;
         case "validate-guess":
-          this.#onGuess(acknowledgement.guess);
+          this.#onGuess(request.guess);
           break;
       }
     });
